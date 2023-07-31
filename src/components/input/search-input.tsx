@@ -32,7 +32,7 @@ const SearchInput = () => {
         url: window.location.href,
         query,
       },
-      { skipEmptyString: true, skipNull: true }
+      { skipEmptyString: true, skipNull: true },
     );
 
     router.push(queryURL);
