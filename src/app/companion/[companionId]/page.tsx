@@ -2,7 +2,6 @@ import { getCategories } from "@/lib/actions/get-categories";
 import { getCompanionById } from "@/lib/actions/get-companions";
 import { Metadata } from "next";
 import CompanionForm from "./components/companion-form";
-import { redirect } from "next/navigation";
 
 export async function generateMetadata({
   params,
@@ -25,5 +24,9 @@ export default async function CompanionPage({
   const companion = await getCompanionById(params.companionId);
   const categories = await getCategories();
 
-  return <CompanionForm initialData={companion} categories={categories} />;
+  return (
+    <div className="my-10">
+      <CompanionForm initialData={companion} categories={categories} />;
+    </div>
+  );
 }
