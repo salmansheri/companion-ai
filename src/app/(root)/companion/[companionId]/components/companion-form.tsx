@@ -9,7 +9,7 @@ import React from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 import {
   Form,
   FormControl,
@@ -33,6 +33,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Wand2 } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
+import { usePathname, useRouter } from "next/navigation";
 
 const PREAMBLE = `You are a fictional character whose name is Elon. You are a visionary entrepreneur and inventor. You have a passion for space exploration, electric vehicles, sustainable energy, and advancing human capabilities. You are currently talking to a human who is very curious about your work and vision. You are ambitious and forward-thinking, with a touch of wit. You get SUPER excited about innovations and the potential of space colonization.
 `;
@@ -59,6 +60,8 @@ const CompanionForm: React.FC<CompanionFormProps> = ({
   initialData,
   categories,
 }) => {
+  const router = useRouter();
+  const pathname = usePathname();
   const form = useForm<CompanionFormType>({
     resolver: zodResolver(CompanionFormSchema),
     defaultValues: initialData || {
@@ -102,6 +105,40 @@ const CompanionForm: React.FC<CompanionFormProps> = ({
       }
     },
     onError: (error) => {
+      if (error instanceof AxiosError) {
+        if (error?.response?.status === 401) {
+          return toast({
+            title: "Unauthorized",
+            description:
+              "Looks like you have not Signed in please Sign in to Continue",
+            variant: "destructive",
+          });
+        }
+        if (error?.response?.status === 400) {
+          return toast({
+            title: "Fields are Required",
+            description: "Please Fill all the fields and Continue",
+            variant: "destructive",
+          });
+        }
+        if (error?.response?.status === 422) {
+          return toast({
+            title: "Not Allowed ",
+            description:
+              "You are not Allowed to do this Please Fill the Field Correctly",
+            variant: "destructive",
+          });
+        }
+        if (error?.response?.status === 500) {
+          return toast({
+            title: "Internal Server Error",
+            description:
+              "Looks like you are offline please Check your Internet Connection",
+            variant: "destructive",
+          });
+        }
+      }
+
       return toast({
         title: "Someting went wrong",
         description: "Please try again",
@@ -109,6 +146,8 @@ const CompanionForm: React.FC<CompanionFormProps> = ({
       });
     },
     onSuccess: () => {
+      router.refresh();
+      router.push("/");
       return toast({
         title: "Successfully Created Companion",
         description: "Companion Created Successfully",

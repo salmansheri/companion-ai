@@ -6,12 +6,12 @@ import CompanionForm from "./components/companion-form";
 export async function generateMetadata({
   params,
 }: {
-  params: { categoryId: string };
+  params: { companionId: string };
 }): Promise<Metadata> {
-  const companion = await getCompanionById(params.categoryId);
+  const companion = await getCompanionById(params.companionId);
 
   return {
-    title: companion.name,
+    title: `Edit ${companion.name} | Companion.ai`,
     description: companion.name,
   };
 }
